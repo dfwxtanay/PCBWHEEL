@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>PCB Spin to Shoot</title>
+
+<style>
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #000;
+    color: white;
+    text-align: center;
+    margin: 0;
+    overflow: hidden;
+  }
+
+  h1 {
+    margin-top: 20px;
+    letter-spacing: 3px;
+    font-weight: 600;
+  }
+
+  .wheel-container {
+    position: relative;
+    margin: 40px auto;
+    width: 380px;
+    height: 380px;
+  }
+
+  canvas {
+    border-radius: 50%;
+    border: 4px solid white;
+    transition: transform 4s cubic-bezier(0.15, 0.7, 0.2, 1);
+    background: black;
+  }
+
+  .pointer {
+    position: absolute;
+    top: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 14px solid transparent;
+    border-right: 14px solid transparent;
+    border-bottom: 28px solid white;
+    z-index: 10;
+  }
+
+  /* Center logo */
+  .logo-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 85px;
+    height: 85px;
+    border-radius: 50%;
+    background: black;
+    border: 2px solid white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  .logo-center img {
+    width: 70%;
+  }
+
+  /* Bottom-right watermark logo */
+  .logo-bottom {
+    position: fixed;
+    bottom: 18px;
+    right: 22px;
+    width: 550px;
+    opacity: 0.9;
+    pointer-events: none;
+  }
+
+  button {
+    padding: 12px 30px;
+    font-size: 16px;
+    border: 2px solid white;
+    border-radius: 30px;
+    cursor: pointer;
+    background: black;
+    color: white;
+    margin-top: 20px;
+    font-weight: 600;
+  }
+
+  .result {
+    margin-top: 25px;
+    font-size: 22px;
+    font-weight: 600;
+    color: white;
+    letter-spacing: 1px;
+  }
+</style>
+</head>
+
+<body>
+
+<h1>PCB — SPIN TO SHOOT</h1>
+
+<div class="wheel-container">
+  <div class="pointer"></div>
+  <canvas id="wheel" width="380" height="380"></canvas>
+
+  <!-- CENTER LOGO -->
+  <div class="logo-center">
+    <img src="pcb_logo.png" alt="PCB Center Logo">
+  </div>
+</div>
+
+<button onclick="spinWheel()">SPIN</button>
+
+<div class="result" id="result"></div>
+
+<!-- BOTTOM RIGHT PCB LOGO -->
+<img
+  src="PCB LOGO WHITE_6.2.1.png"
+  class="logo-bottom"
+  alt="PCB Logo Bottom Right"
+/>
+
+<script>
+  const canvas = document.getElementById("wheel");
+  const ctx = canvas.getContext("2d");
+
+  const challenges = [
+    "RECREATE",
+    "ONE COLOR",
+    "EMOTION",
+    "ONE LIGHT",
+    "MOTION",
+    "SILHOUETTE",
+    "WILDCARD"
+  ];
+
+  const total = challenges.length;
+  const arc = (2 * Math.PI) / total;
+  let currentRotation = 0;
+
+  function drawWheel() {
+    for (let i = 0; i < total; i++) {
+      const startAngle = arc * i - Math.PI / 2;
+      const endAngle = startAngle + arc;
+
+      const isBlack = i % 2 === 0;
+      ctx.beginPath();
+      ctx.fillStyle = isBlack ? "#000" : "#fff";
+      ctx.moveTo(190, 190);
+      ctx.arc(190, 190, 190, startAngle, endAngle);
+      ctx.fill();
+
+      ctx.save();
+      ctx.translate(190, 190);
+      ctx.rotate(startAngle + arc / 2);
+      ctx.textAlign = "right";
+      ctx.fillStyle = isBlack ? "#fff" : "#000";
+      ctx.font = "bold 16px Arial";
+      ctx.fillText(challenges[i], 165, 6);
+      ctx.restore();
+    }
+  }
+
+  drawWheel();
+
+  function spinWheel() {
+    const spinDegrees = Math.floor(Math.random() * 360) + 1440;
+    currentRotation += spinDegrees;
+    canvas.style.transform = `rotate(${currentRotation}deg)`;
+
+    setTimeout(() => {
+      const normalizedRotation = currentRotation % 360;
+      const index =
+        Math.floor(
+          (360 - normalizedRotation + 360 / total / 2) /
+          (360 / total)
+        ) % total;
+
+      document.getElementById("result").innerText =
+        "CHALLENGE → " + challenges[index];
+    }, 4000);
+  }
+</script>
+
+</body>
+</html>
